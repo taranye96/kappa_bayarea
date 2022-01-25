@@ -1,0 +1,22 @@
+#!/bin/bash
+
+home="/Users/tnye/kappa/data/waveforms"
+
+# Loop through event folders for broadband data
+cd $home/acc/Vs3.1/cut2_20
+for d in */ ; do
+
+    # Create event folder in new directory
+    new_dir=$home/acc_all/Vs3.1/cut2_20/$d
+    mkdir $new_dir
+
+    # Copy over mseed to new folder
+    cp -a ./$d. $new_dir
+done
+
+# Loop through event folders for sm data
+cd $home/sm_acc/Vs3.1/cut2_20
+for d in */ ; do
+    # Copy over mseed to new folder
+    cp -a ./$d. $home/acc_all/Vs3.1/cut2_20/$d
+done

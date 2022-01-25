@@ -1,0 +1,19 @@
+#!/bin/bash
+
+seg_file=/Users/tnye/kappa/data/flatfiles/full_bay_flatfile.csv
+outfile=/Users/tnye/kappa/data/paths/paths_250.txt
+
+for i in {2..536100}
+do
+  rhyp=$(awk -v i="$i" -F, 'NR==i {print $13}' $seg_file)
+  mag=$(awk -v i="$i" -F, 'NR==i {print $8}' $seg_file)
+  if [[ $(echo "$mag >= 3.5" | bc) == 1 ]]; then
+    if [[ $(echo "$rhyp <= 250" | bc) == 1 ]]; then
+    # Get station lon, lat
+    echo ">-Z1.515476448" >>/Users/tnye/kappa/data/paths/paths_250.txt
+    awk -v i="$i" -F, 'NR==i {print $5,$4}' $seg_file>>$outfile
+    awk -v i="$i" -F, 'NR==i {print $10,$9}' $seg_file>>$outfile
+    fi
+  fi
+
+done
