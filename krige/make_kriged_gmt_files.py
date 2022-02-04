@@ -14,7 +14,7 @@ import pandas as pd
 # Script that makes a GMT text file with the kriged kappa data. 
 ###############################################################################
 
-model_name = 'model1'
+model_name = 'model2'
 
 df = pd.read_csv(f'/Users/tnye/kappa/krige/{model_name}_krige_k0_lonlat.csv')
 
@@ -25,7 +25,7 @@ for i in range(len(df)):
 f.close()
 
 f = open(f'/Users/tnye/kappa/krige/{model_name}_pred_stddev_lonlat.txt','w')
-f.write('#Longitude,Latitude,k0_stddev\n')
+f.write('#Longitude,Latitude,Log10 k0 stddev\n')
 for i in range(len(df)):
-    f.write(f"{df['Longitude'].iloc[i]},{df['Latitude'].iloc[i]},{df['k0_stddev'].iloc[i]}\n")
+    f.write(f"{df['Longitude'].iloc[i]},{df['Latitude'].iloc[i]},{df['klog10k0_stddev'].iloc[i]}\n")
 f.close()

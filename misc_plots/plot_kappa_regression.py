@@ -79,7 +79,7 @@ def plot_kappa(model_name,home_dir,df,min_events):
         # stations.append(stn)
         
         # prepare confidence level curves
-        nstd = 3. # to draw 3-sigma intervals
+        nstd = 2. # to draw 2-sigma intervals (95% confidence)
         a_fit_up = a_fit + nstd * perr
         a_fit_dw = a_fit - nstd * perr
         
@@ -100,7 +100,7 @@ def plot_kappa(model_name,home_dir,df,min_events):
         title(f'{stn}: Kappa={round(inter,4)}', fontsize=12)
         plot(x, fit, 'r', lw=1, label='best fit curve')
         scatter(rrup, kappa, c='k', s=5, label='True curve')
-        ax.fill_between(x, fit_up, fit_dw, alpha=.25, label='3-sigma interval')
+        ax.fill_between(x, fit_up, fit_dw, alpha=.25, label='95% Confidence Interval')
         ax.set_xlim(xmin=0)
         legend(loc='lower right',fontsize=8)
         plt.savefig(f'{figpath}/{stn}_kappa.png', dpi=300)

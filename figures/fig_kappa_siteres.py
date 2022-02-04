@@ -82,6 +82,8 @@ for i, stn in enumerate(stns):
             k_est.append(kappa_list[i])
             pga_ds_est.append(site_res_file['lnASK14_PGA_Res dS'].iloc[ind])
             pgv_ds_est.append(site_res_file['lnASK14_PGV_Res dS'].iloc[ind])
+    else:
+        print(f'no data for stn {stn}')
 
 
 # dataset_dict = {'Kappa':kappa, 'Vs30':vs30, 'PGA_site_res':pga_ds, 'PGV_site_res':pgv_ds}
@@ -102,15 +104,15 @@ mpl.rcParams['pdf.fonttype'] = 42
 mpl.rcParams['ps.fonttype'] = 42
 mpl.rcParams['font.family'] = 'Helvetica'
 
-fig, ax = plt.subplots(figsize=(6.5,5))
+fig, ax = plt.subplots(figsize=(6,5))
 # sns.regplot(ax=ax, x="Kappa", y="Vs30", data=df, robust=False, scatter=False)
 # ax.scatter(kappa, vs30, c=vs30_idx)
 ax.set_xlim(0,0.12)
-ax.set_ylim(100,850)
+ax.set_ylim(0,850)
 sns.regplot(ax=ax, x="Kappa", y="Vs30", data=est_df, robust=False, truncate=False, label='$V_{S30,est}$')
 sns.regplot(ax=ax, x="Kappa", y="Vs30", data=ms_df, robust=False, truncate=False, label='$V_{S30,meas}$')
-ax.set_ylabel('$V_{S30}$ (m/s)',fontsize=12)
-ax.set_xlabel('$\kappa_0$ (s)',fontsize=12)
+ax.set_ylabel('$V_{S30}$ (m/s)',fontsize=14)
+ax.set_xlabel('$\kappa_0$ (s)',fontsize=14)
 ax.tick_params(direction="out",labelright=False,top=True,right=True,labelsize=12)
 ax.yaxis.set_minor_locator(MultipleLocator(100))
 ax.yaxis.set_major_locator(MultipleLocator(200))
@@ -121,20 +123,7 @@ ax.grid(linestyle='--',alpha=0.5)
 # ax.legend(loc='upper left')
 ax.legend(loc="lower center", bbox_to_anchor=(0.5, -0.25), ncol=2)
 ax.collections[1].set_label('95% Confidence interval')
-
-pop_size = len(vs30_ms)
-r,pval = pearsonr(k_ms,vs30_ms)
-pval_text = f'{round(pval,2)}'
-if round(pval,2) == 0:
-    pval_text = '< 0.001'
-power = tt_ind_solve_power(effect_size=r,nobs1=pop_size,alpha=0.05)
-textstr = '\n'.join((
-    '$V_{S30,meas}$',
-    f'Pearson R: {round(r,3)}',
-    f'P-value: {pval_text}',
-    f'Power: {round(power,2)}'))
-props = dict(boxstyle='round', facecolor='white', alpha=0.7)
-ax.text(0.76, 0.975, textstr, transform=ax.transAxes, fontsize=10, va='top', ha='left', bbox=props)
+plt.subplots_adjust(top=0.96, bottom=0.2, left = 0.125, right = 0.96)
 
 pop_size = len(vs30_est)
 r,pval = pearsonr(k_est,vs30_est)
@@ -144,12 +133,27 @@ if round(pval,2) == 0:
 power = tt_ind_solve_power(effect_size=r,nobs1=pop_size,alpha=0.05)
 textstr = '\n'.join((
     '$V_{S30,est}$',
-    f'Pearson R: {round(r,3)}',
+    f'Pearson R: {round(r,2)}',
     f'P-value: {pval_text}',
     f'Power: {round(power,2)}'))
 props = dict(boxstyle='round', facecolor='white', alpha=0.7)
-ax.text(0.76, 0.78, textstr, transform=ax.transAxes, fontsize=10, va='top', ha='left', bbox=props)
-plt.subplots_adjust(top=0.96, bottom=0.2, left = 0.105, right = 0.96)
+# ax.text(0.76, 0.78, textstr, transform=ax.transAxes, fontsize=10, va='top', ha='left', bbox=props)
+ax.text(0.05, 0.05, textstr, transform=ax.transAxes, fontsize=12, va='bottom', ha='left', bbox=props)
+
+pop_size = len(vs30_ms)
+r,pval = pearsonr(k_ms,vs30_ms)
+pval_text = f'{round(pval,2)}'
+if round(pval,2) == 0:
+    pval_text = '< 0.001'
+power = tt_ind_solve_power(effect_size=r,nobs1=pop_size,alpha=0.05)
+textstr = '\n'.join((
+    '$V_{S30,meas}$',
+    f'Pearson R: {round(r,2)}',
+    f'P-value: {pval_text}',
+    f'Power: {round(power,2)}'))
+props = dict(boxstyle='round', facecolor='white', alpha=0.7)
+# ax.text(0.76, 0.975, textstr, transform=ax.transAxes, fontsize=10, va='top', ha='left', bbox=props)
+ax.text(0.675, 0.05, textstr, transform=ax.transAxes, fontsize=12, va='bottom', ha='left', bbox=props)
     
 plt.show()
 plt.savefig(f'/Users/tnye/kappa/plots/paper/kappa_vs30_{model_name}.png', dpi=300)
@@ -168,7 +172,9 @@ mpl.rcParams['pdf.fonttype'] = 42
 mpl.rcParams['ps.fonttype'] = 42
 mpl.rcParams['font.family'] = 'Helvetica'
 
-fig = plt.figure(figsize=(10,14))
+# fig = plt.figure(figsize=(12,14))
+fig = plt.figure(figsize=(13,12))
+
 ax1 = fig.add_subplot(2,2,1)
 ax2 = fig.add_subplot(2,2,2, sharey = ax1)
 ax3 = fig.add_subplot(2,2,3, sharex = ax1)
@@ -181,8 +187,8 @@ ax1.set_ylim(-2.25,1.25)
 ax1.set_xlim(0,0.12)
 sns.regplot(ax=ax1, x="Kappa", y="PGA_site_res", data=kappa_df, robust=False, truncate=False,)
 # ax1.set_xlabel('')
-ax1.set_xlabel('$\kappa_0$ (s)',fontsize=12)
-ax1.set_ylabel('ln(PGA $\delta S_j$)',fontsize=12)
+ax1.set_xlabel('$\kappa_0$ (s)',fontsize=14)
+ax1.set_ylabel('ln(PGA $\delta S_j$)',fontsize=14)
 ax1.tick_params(direction="out",labelbottom=True,labelright=False,top=True,right=True,labelsize=12)
 ax1.yaxis.set_minor_locator(MultipleLocator(0.5))
 ax1.yaxis.set_major_locator(MultipleLocator(1))
@@ -190,7 +196,7 @@ ax1.xaxis.set_minor_locator(MultipleLocator(0.01))
 ax1.xaxis.set_major_locator(MultipleLocator(0.02))
 ax1.tick_params(which='minor', top=True, right=True)
 ax1.collections[1].set_label('95% Confidence interval')
-ax1.text(-0.175,1.0,'(a)',transform=ax1.transAxes,fontsize=12,va='top',ha='right',weight='bold')
+ax1.text(-0.175,1.0,'(a)',transform=ax1.transAxes,fontsize=14,va='top',ha='right',weight='bold')
 
 # Vs30 vs PGA
 ax2.grid(linestyle='--',alpha=0.5)
@@ -198,8 +204,8 @@ ax2.set_ylim(-2.25,1.25)
 ax2.set_xlim(100,850)
 sns.regplot(ax=ax2, x="Vs30", y="PGA_site_res", data=est_df, robust=False, truncate=False, label='$V_{S30,est}$')
 sns.regplot(ax=ax2, x="Vs30", y="PGA_site_res", data=ms_df, robust=False, truncate=False, label='$V_{S30,meas}$')
-ax2.set_xlabel('$V_{S30}$ (m/s)',fontsize=12)
-ax2.set_ylabel('ln(PGA $\delta S_j$)',fontsize=12)
+ax2.set_xlabel('$V_{S30}$ (m/s)',fontsize=14)
+ax2.set_ylabel('ln(PGA $\delta S_j$)',fontsize=14)
 ax2.collections[1].set_label('95% Confidence interval')
 ax2.collections[3].set_label('95% Confidence interval')
 ax2.tick_params(direction="out",labelleft=True,labelbottom=True,labelright=False,top=True,right=True,labelsize=12)
@@ -208,15 +214,15 @@ ax2.yaxis.set_major_locator(MultipleLocator(1))
 ax2.xaxis.set_minor_locator(MultipleLocator(100))
 ax2.xaxis.set_major_locator(MultipleLocator(200))
 ax2.tick_params(which='minor', top=True, right=True)
-ax2.text(-0.175,1.0,'(b)',transform=ax2.transAxes,fontsize=12,va='top',ha='right',weight='bold')
+ax2.text(-0.175,1.0,'(b)',transform=ax2.transAxes,fontsize=14,va='top',ha='right',weight='bold')
 
 # Kappa vs PGV
 ax3.grid(linestyle='--',alpha=0.5)
 ax3.set_ylim(-2.25,1.25)
 ax3.set_xlim(0.0,0.12)
 sns.regplot(ax=ax3, x="Kappa", y="PGV_site_res", data=kappa_df, truncate=False, robust=False)
-ax3.set_xlabel('$\kappa_0$ (s)',fontsize=12)
-ax3.set_ylabel('ln(PGV $\delta S_j$)',fontsize=12)
+ax3.set_xlabel('$\kappa_0$ (s)',fontsize=14)
+ax3.set_ylabel('ln(PGV $\delta S_j$)',fontsize=14)
 ax3.tick_params(direction="out",top=True,right=True)
 ax3.yaxis.set_minor_locator(MultipleLocator(0.5))
 ax3.yaxis.set_major_locator(MultipleLocator(1))
@@ -224,9 +230,8 @@ ax3.xaxis.set_minor_locator(MultipleLocator(0.01))
 ax3.xaxis.set_major_locator(MultipleLocator(0.02))
 ax3.tick_params(which='minor', top=True, right=True)
 ax3.collections[1].set_label('95% Confidence interval')
-ax3.text(-0.175,1.0,'(c)',transform=ax3.transAxes,fontsize=12,va='top',ha='right',weight='bold')
-# ax3.legend(loc='upper right')
-ax3.legend(loc="lower center", bbox_to_anchor=(0.5, -0.35))
+ax3.text(-0.175,1.0,'(c)',transform=ax3.transAxes,fontsize=14,va='top',ha='right',weight='bold')
+ax3.legend(loc="lower center", prop={"size":14}, bbox_to_anchor=(0.5, -0.325))
 
 
 # Vs30 vs PGV
@@ -235,9 +240,9 @@ ax4.set_ylim(-2.25,1.25)
 ax4.set_xlim(100,850)
 sns.regplot(ax=ax4, x="Vs30", y="PGV_site_res", data=est_df, robust=False, truncate=False, label='$V_{S30,est}$')
 sns.regplot(ax=ax4, x="Vs30", y="PGV_site_res", data=ms_df, robust=False, truncate=False, label='$V_{S30,meas}$')
-ax4.set_xlabel('$V_{S30}$ (m/s)',fontsize=12)
+ax4.set_xlabel('$V_{S30}$ (m/s)',fontsize=14)
 # ax4.set_ylabel('')
-ax4.set_ylabel('ln(PGV $\delta S_j$)',fontsize=12)
+ax4.set_ylabel('ln(PGV $\delta S_j$)',fontsize=14)
 ax4.collections[1].set_label('95% Confidence interval')
 ax4.collections[3].set_label('95% Confidence interval')
 ax4.tick_params(direction="out",labelleft=True,top=True,right=True,labelsize=12)
@@ -246,9 +251,8 @@ ax4.yaxis.set_major_locator(MultipleLocator(1))
 ax4.xaxis.set_minor_locator(MultipleLocator(100))
 ax4.xaxis.set_major_locator(MultipleLocator(200))
 ax4.tick_params(which='minor', top=True, right=True)
-ax4.text(-0.175,1.0,'(d)',transform=ax4.transAxes,fontsize=12,va='top',ha='right',weight='bold')
-# ax4.legend(loc='upper right')
-ax4.legend(loc="lower center", bbox_to_anchor=(0.5, -0.45), ncol=2)
+ax4.text(-0.175,1.0,'(d)',transform=ax4.transAxes,fontsize=14,va='top',ha='right',weight='bold')
+ax4.legend(loc="lower center", prop={"size":14}, bbox_to_anchor=(0.5, -0.425), ncol=2)
 
 # Add stats to subplots
 # Kappa metrics
@@ -264,7 +268,7 @@ for i, ax in enumerate([ax1,ax3]):
         f'P-value: {pval_text}',
         f'Statistical Power: {round(power,2)}'))
     props = dict(boxstyle='round', facecolor='white', alpha=0.7)
-    ax.text(0.05, 0.05, textstr, transform=ax.transAxes, fontsize=10,
+    ax.text(0.05, 0.05, textstr, transform=ax.transAxes, fontsize=12,
         verticalalignment='bottom', bbox=props)
 
 for i, ax in enumerate([ax2,ax4]):
@@ -296,13 +300,13 @@ for i, ax in enumerate([ax2,ax4]):
     r'$\underline{Measured V_{S30}}$'
     
     props = dict(boxstyle='round', facecolor='white', alpha=0.7)
-    ax.text(0.05, 0.05, est_txtstr, transform=ax.transAxes, fontsize=10,
+    ax.text(0.05, 0.05, est_txtstr, transform=ax.transAxes, fontsize=12,
         verticalalignment='bottom', bbox=props)
-    # ax.text(0.05, 0.95, ms_txtstr, transform=ax.transAxes, fontsize=10,
+    # ax.text(0.05, 0.95, ms_txtstr, transform=ax.transAxes, fontsize=12,
     #     va='top', bbox=props)
-    ax.text(0.6, 0.05, ms_txtstr, transform=ax.transAxes, fontsize=10,
+    ax.text(0.59, 0.05, ms_txtstr, transform=ax.transAxes, fontsize=12,
         va='bottom', bbox=props)
     
-plt.subplots_adjust(wspace=0.35, hspace=0.3, left=0.1, right=0.97, top=0.98, bottom=0.17)
+plt.subplots_adjust(wspace=0.35, hspace=0.27, left=0.1, right=0.925, top=0.98, bottom=0.17)
 plt.show()
 plt.savefig(f'/Users/tnye/kappa/plots/paper/site_param_correlation_{model_name}.png', dpi=300)

@@ -174,7 +174,7 @@ for i, stn in enumerate(stns):
     axs[i,1].set_ylabel(r'$\kappa$ (s)', fontsize=12)
     axs[i,1].set_title(f'{stn}', fontsize=12)
     axs[i,1].plot(x, fit, 'r', lw=1, label='best fit curve')
-    axs[i,1].scatter(rrup, kappa_list, c='k', s=5, label='True curve')
+    axs[i,1].scatter(rrup, kappa_list, c='k', s=5, label='$\kappa$ estimates')
     axs[i,1].fill_between(x, fit_up, fit_dw, alpha=.25, label='3-sigma interval')
     axs[i,1].set_xlim(xmin=0)
     axs[i,1].text(0.95, 0.1, f'$\kappa_0$ = {round(inter,3)} s',transform=axs[i,1].transAxes,fontsize=11,va='top',ha='right')

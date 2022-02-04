@@ -17,12 +17,14 @@ from glob import glob
 import geopandas as gpd
 from shapely.geometry import Point, Polygon
 
+model_name = 'model1'
+
 kml = '/Users/tnye/kappa/data/google_earth/damage_zones.kml'
 
 # Get list of station coordinates
-locations = pd.read_csv('/Users/tnye/kappa/GMT/data/kappa/updated_stns.txt')
+locations = pd.read_csv(f'/Users/tnye/kappa/GMT/data/kappa/{model_name}.txt')
 
-kappa_file = pd.read_csv('/Users/tnye/kappa/traditional_method/models/final_model/final_model_kappa.out',delimiter='\t')
+kappa_file = pd.read_csv(f'/Users/tnye/kappa/traditional_method/models/{model_name}/{model_name}_kappa.out',delimiter='\t')
 
 # Initialize dataframe
 stn_df = pd.DataFrame(np.nan, np.arange(len(locations)), columns=['Station', 'Longitude', 'Latitude', 'Kappa', 'Fault_Zone'])
@@ -59,5 +61,5 @@ for i in range(0, len(geo_locations)):
     except:
         continue
 
-stn_df.to_csv('/Users/tnye/kappa/data/fault_zone_stns.csv')
+stn_df.to_csv(f'/Users/tnye/kappa/data/fault_zone_stns_{model_name}.csv')
 

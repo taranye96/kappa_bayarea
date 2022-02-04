@@ -15,7 +15,7 @@ Created on Sat Jan 22 11:47:28 2022
 import pandas as pd
 import numpy as np
 
-model_name = 'final_model3'
+model_name = 'model1'
 
 lst_str_cols = ['Station','Name']
 dict_dtypes = {x : 'str'  for x in lst_str_cols}
@@ -35,7 +35,6 @@ for stn in stations:
     ind = np.where(np.array(catalog['Name'])==stn)[0][0]
     slon.append(catalog['Slon'].iloc[ind])
     slat.append(catalog['Slat'].iloc[ind])
-    kappa.append()
 
 for event in events:
     yyyy,mth,dd,hh,mm,sec = event.split('_')[1:]
@@ -46,15 +45,15 @@ for event in events:
     mag.append(catalog['Mag'].iloc[ind]/10)
 
 # Make station file
-outfile = open(f'/Users/tnye/kappa/GMT/data/{model_name}_stns.txt', 'w')
+outfile = open(f'/Users/tnye/kappa/GMT/data/sites/{model_name}_stns.txt', 'w')
 out = np.column_stack((slon, slat))
-outfile.write('#Longitude \t Latitude\n')
-np.savetxt(outfile, out, fmt='%s', delimiter='\t')
+outfile.write('#Longitude,Latitude\n')
+np.savetxt(outfile, out, fmt='%s', delimiter=',')
 outfile.close()
 
 # Make station file
-outfile = open(f'/Users/tnye/kappa/GMT/data/{model_name}_events.txt', 'w')
+outfile = open(f'/Users/tnye/kappa/GMT/data/events/{model_name}_events.txt', 'w')
 out = np.column_stack((qlon, qlat, mag))
-outfile.write('#Longitude \t Latitude \t Scaled Magnitude\n')
-np.savetxt(outfile, out, fmt='%s', delimiter='\t')
+outfile.write('#Longitude,Latitude,Scaled Magnitude\n')
+np.savetxt(outfile, out, fmt='%s', delimiter=',')
 outfile.close()

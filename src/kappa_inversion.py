@@ -38,7 +38,7 @@ def run_kappa_inv(freq, amp, std):
     A0 = np.exp(float(m[1]))
     
     # Find covariance? Propagate error?
-    covd = np.diag(((std)/(amp))**2.)
+    covd = np.diag((std/amp)**2.)
     covm = np.dot((np.dot(G_inv, covd)), G_inv.T)
     var = (covm.diagonal())
     

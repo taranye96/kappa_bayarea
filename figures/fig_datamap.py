@@ -18,7 +18,9 @@ import pandas as pd
 import matplotlib as mpl
 import matplotlib.pyplot as plt
 
-df = pd.read_csv('/Users/tnye/kappa/data/flatfiles/final_dataset.csv')
+model_name = 'model1'
+
+df = pd.read_csv(f'/Users/tnye/kappa/data/flatfiles/final_dataset.csv')
 
 # idx = np.where((np.array(df['Mag']) >= 3.5) & (np.array(df['Mag']) <= 5.5) &
 #                (np.array(df['Rhyp']) <= 250))[0]

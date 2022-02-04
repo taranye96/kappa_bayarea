@@ -13,10 +13,13 @@
 library('geoR')
 library('pracma')
 
+model <- 'model2'
+nug.model <- 0.0043
+
 # Read data:
 # - Coordinates are NZTM northings and eastings, converted to km for convenience.
 # - Data are log10(k0)
-k0_dat <- readRDS("/Users/tnye/kappa/krige/model1_my_data.rds")
+k0_dat <- readRDS(sprintf("/Users/tnye/kappa/krige/%s_my_data.rds", model))
 grid <- read.csv("/Users/tnye/kappa/krige/grid_lonlat.txt")
 
 # Initial values for regression
@@ -28,8 +31,6 @@ ini.sill <- 0.1
 theta <- 0.5 
 
 # Model 1 - solving for nugget
-# model1 <- likfit(k0_dat, cov.model="matern", ini.cov.pars = c(ini.sill, ini.phi), 
-#                  nug = ini.nug, fix.nugget=F, kappa=theta, fix.kappa=T,trend=~BAY)
 
 model <- likfit(k0_dat, cov.model="matern", ini.cov.pars = c(ini.sill, ini.phi), 
                  nug = ini.nug, fix.nugget=F, kappa=theta, fix.kappa=T,trend="cte")
@@ -53,7 +54,7 @@ fbay<-ifelse(inpolygon(grid$Longitude, grid$Latitude,
                        whole.bay$Longitude, whole.bay$Latitude), 1, 0)
 # Prediction
 # nug.model <- model$tausq
-nug.model <- 0.0026
+#nug.model <- 0.0026
 theta.model <- 0.5
 sill.model <- model$sigmasq
 phi.model <- model$phi
@@ -72,10 +73,11 @@ kc.model <- krige.conv(k0_dat, loc = grid,
 Nor <- kc.model$Var2 * 1000
 Eas <- kc.model$Var1 * 1000
 k0.model <- 10^kc.model$predict
-k0.stddev <- sqrt(kc.model$krige.var + nug.model)
+logk0.stddev <- sqrt(kc.model$krige.var + nug.model)
 
-df <- data.frame("Latitude"=grid[,2], "Longitude"=grid[,1], "pred_k0"=k0.model, "k0_stddev"=k0.stddev)
-write.csv(df, "/Users/tnye/kappa/krige/model1_krige_k0_lonlat.csv", row.names = FALSE)
-# write.csv(df, "/Users/tnye/kappa/krige/krige_k0_lonlat_nug.csv", row.names = FALSE)
+df <- data.frame("Latitude"=grid[,2], "Longitude"=grid[,1], "pred_k0"=k0.model, "log10k0_stddev"=logk0.stddev)
+write.csv(df, sprintf("/Users/tnye/kappa/krige/%s_krige_k0_lonlat.csv", model), row.names = FALSE)
+#(df, "/Users/tnye/kappa/krige/model2_krige_k0_lonlat.csv", row.names = FALSE)
+
 
 

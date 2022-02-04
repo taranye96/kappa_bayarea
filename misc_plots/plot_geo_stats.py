@@ -49,15 +49,18 @@ plt.savefig('/Users/tnye/kappa/plots/kappa_vs_geology.png', dpi=300)
 plt.close()
 
 
-###############################################################################
+#%% ###############################################################################
+
 
 # Imports
 import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
 
-fault = pd.read_csv('/Users/tnye/kappa/data/fault_zone_stns.csv')
-kappa_list = pd.read_csv('/Users/tnye/kappa/traditional_method/models/test/updated_stns/updated_stns_kappa.out',delimiter='\t')[' kappa(s) ']
+model_name = 'model1'
+
+fault = pd.read_csv(f'/Users/tnye/kappa/data/fault_zone_stns_{model_name}.csv')
+kappa_list = pd.read_csv(f'/Users/tnye/kappa/traditional_method/models/{model_name}/{model_name}_kappa.out',delimiter='\t')[' kappa(s) ']
 
 # categories = ['Quaternary', 'Sedimentary', 'Franciscan', 'Great Valley', 'Metamorphic', 'Volcanic' ]
 # categories = ['Alluvium', 'Artificial Fill', 'Mud', 'Sand', 'Misc. Quaternary', 'Sedimentary', 'Volcanic', 'Metamorphic' ]
@@ -73,7 +76,8 @@ for i, cat in enumerate(categories):
     # kappa_units.append(med_kappa)
     
    
-    n, bins, patches = plt.hist(kappa, bins=23, range=(0.005,0.115), alpha=0.5, label=cat)
+    # n, bins, patches = plt.hist(kappa, bins=23, range=(0.005,0.115), alpha=0.5, label=cat)
+    n, bins, patches = plt.hist(kappa, range=(0.005,0.115), alpha=0.5, label=cat)
     c=patches[0].get_facecolor()
     plt.vlines(mean_kappa, 0, 50, color=c, ls='--')
     # plt.vlines(med_kappa, 0, 50, color=c, ls='--')
@@ -86,8 +90,8 @@ for i, cat in enumerate(categories):
 
 plt.title('Fault Damage Zone')
 plt.show()
-plt.savefig('/Users/tnye/kappa/plots/kappa_vs_faults.png', dpi=300)
-plt.close()
+plt.savefig(f'/Users/tnye/kappa/plots/kappa_vs_faults_{model_name}.png', dpi=300)
+# plt.close()
 
 
 

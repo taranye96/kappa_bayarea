@@ -17,6 +17,8 @@ import pandas as pd
 from obspy import read
 from glob import glob
 
+model_name = 'model1'
+
 # Read in datafile
 main_df = pd.read_csv('/Users/tnye/kappa/data/flatfiles/SNR_5_file.csv')
 
@@ -24,7 +26,7 @@ main_df = pd.read_csv('/Users/tnye/kappa/data/flatfiles/SNR_5_file.csv')
 stations = np.unique(np.array(main_df['Name']))
 
 # Initialize text file
-log = '/Users/tnye/kappa/data/stations.txt'
+log = f'/Users/tnye/kappa/data/stations_{model_name}.txt'
 f = open(log,'w+')
 f.write('# Station, Samprate, Longitude, Latitude, Rhyp(km)\n')
 
