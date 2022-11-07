@@ -6,6 +6,11 @@ Created on Fri Jan 21 14:10:57 2022
 @author: tnye
 """
 
+###############################################################################
+# This module has a function to perform the inversion for kappa on a record. 
+# This is called in kappa_methods.py.
+###############################################################################
+
 def run_kappa_inv(freq, amp, std):
      
     import numpy as np
