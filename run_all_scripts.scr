@@ -1,0 +1,33 @@
+#!/bin/bash
+
+######################################
+Script for running all the main files.
+######################################
+
+cd /Users/tnye/kappa/code
+
+python ./kappa/compute_kappa.py
+
+python ./krige/set_up_rds.py
+
+#Make sure to delete any empty columns at the front of the dataframe before continuing
+
+Rscript.exe ./krige/make_rds.R
+
+Rscript.exe ./krige/bay_krige_variogram.r
+
+python ./krige/make_kriged_gmt_files.py
+
+./krige/kriged_map.gmt
+
+./krige/kriged_stddev.gmt
+
+./site_res/get_Vs30.gmt gets coordinates for final set of stations in dataset and uses grid search to get Vs30 for those stations
+
+python ./site_res/initialize_gmm_df.py
+
+python ./site_res/make_gmm_df.py
+
+Rscripte.exe ./site_res/cnn_compute_meml_residuals.r
+
+python ./site_res/cnn_reformat_R_residuals.py
