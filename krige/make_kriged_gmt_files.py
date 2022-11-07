@@ -6,26 +6,49 @@ Created on Thu Dec 30 17:27:51 2021
 @author: tnye
 """
 
-# Imports
-import numpy as no
-import pandas as pd
-
 ###############################################################################
 # Script that makes a GMT text file with the kriged kappa data. 
 ###############################################################################
 
-model_name = 'model2'
+# Imports
+import numpy as np
+import pandas as pd
 
-df = pd.read_csv(f'/Users/tnye/kappa/krige/{model_name}_krige_k0_lonlat.csv')
+model_name = 'model4.6.7'
+semivariogram_sill = 0.0001946156
 
-f = open(f'/Users/tnye/kappa/krige/{model_name}_krige_k0_lonlat.txt','w')
+# Read in .csv with kriged predictions
+df = pd.read_csv(f'/Users/tnye/kappa/krige/{model_name}/{model_name}_culled_krige_k0_linear.csv')
+
+# Make file for k0 predictions
+f = open(f'/Users/tnye/kappa/krige/{model_name}/{model_name}_culled_pred_k0.txt','w')
 f.write('#Longitude,Latitude,kappa(s)\n')
 for i in range(len(df)):
     f.write(f"{df['Longitude'].iloc[i]},{df['Latitude'].iloc[i]},{df['pred_k0'].iloc[i]}\n")
 f.close()
 
-f = open(f'/Users/tnye/kappa/krige/{model_name}_pred_stddev_lonlat.txt','w')
+# Make file for pred stddev (log 10)
+f = open(f'/Users/tnye/kappa/krige/{model_name}/{model_name}_culled_pred_stddev.txt','w')
 f.write('#Longitude,Latitude,Log10 k0 stddev\n')
 for i in range(len(df)):
-    f.write(f"{df['Longitude'].iloc[i]},{df['Latitude'].iloc[i]},{df['klog10k0_stddev'].iloc[i]}\n")
+    f.write(f"{df['Longitude'].iloc[i]},{df['Latitude'].iloc[i]},{df['k0_stddev'].iloc[i]}\n")
+f.close()
+
+
+# Get regions where stddev is within sill
+ind = np.where(df['k0_stddev']<=np.sqrt(semivariogram_sill))[0]
+df_cut = df.loc[ind]
+
+# Make file for k0 predictions
+f = open(f'/Users/tnye/kappa/krige/{model_name}/{model_name}_culled_pred_k0_cut.txt','w')
+f.write('#Longitude,Latitude,kappa(s)\n')
+for i in range(len(df_cut)):
+    f.write(f"{df_cut['Longitude'].iloc[i]},{df_cut['Latitude'].iloc[i]},{df_cut['pred_k0'].iloc[i]}\n")
+f.close()
+
+# Make file for pred stddev (log 10)
+f = open(f'/Users/tnye/kappa/krige/{model_name}/{model_name}_culled_pred_stddev_cut.txt','w')
+f.write('#Longitude,Latitude,Log10 k0 stddev\n')
+for i in range(len(df_cut)):
+    f.write(f"{df_cut['Longitude'].iloc[i]},{df_cut['Latitude'].iloc[i]},{df_cut['k0_stddev'].iloc[i]}\n")
 f.close()

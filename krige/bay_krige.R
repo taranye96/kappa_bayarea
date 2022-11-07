@@ -1,9 +1,7 @@
 ##################################################################################
-# R code to read station k0 data from Van Houtte et al. (2018), "A continuous 
-# near-surface S-wave attenuation map of New Zealand", Geophysical Journal 
-# International, https://doi.org/10.1093/gji/ggx559, and calculates the continuous 
-# k0 maps using kriging. 
-# Please refer to the article, for explanations of 'Model 1' and 'Model 2'
+# R code to read station k0 data and produce a spatially-continuous map for the 
+# San Francisco Bay area. Code modified from 
+# https://github.com/cvanhoutte-zz/kappa/blob/master/codes/krige.R
 #
 # Requires R packages {geoR} and {pracma}.
 #
@@ -12,72 +10,60 @@
 # Imports
 library('geoR')
 library('pracma')
+library('gstat')
+library(sp)
 
-model <- 'model2'
-nug.model <- 0.0043
+# Name of model
+model_name <- 'model4.6.7'
 
-# Read data:
-# - Coordinates are NZTM northings and eastings, converted to km for convenience.
-# - Data are log10(k0)
-k0_dat <- readRDS(sprintf("/Users/tnye/kappa/krige/%s_my_data.rds", model))
-grid <- read.csv("/Users/tnye/kappa/krige/grid_lonlat.txt")
+# Read data for kappa estimates from rds file and turn into a dataframe:
+# - Coordinates are degrees lon and lat
+k0rds <- readRDS(sprintf("/Users/tnye/kappa/krige/model4.6.7/%s_culled_my_data_lonlat.rds", model_name))
+kappa <- k0rds$data
+longitude <- k0rds$coords[,1]
+latitude <- k0rds$coords[,2]
+k0.data <- data.frame(longitude, latitude, kappa)
 
-# Initial values for regression
+# Define coordinates
+coordinates(k0.data) = ~longitude+latitude
+
+# Initial values for regression (from Van Houtte et al., 2018)
 ini.nug <- 0
-ini.phi <- 100
-ini.sill <- 0.1
+ini.sill <- 0.0002
+ini.range <- 0.4
 
-# Matern order (fixed)
+# Matern order (fixed) (from Van Houtte et al., 2018)
 theta <- 0.5 
 
-# Model 1 - solving for nugget
+# Make and plot variogram
+k0.vgm = variogram(kappa~1, k0.data)
+k0.fit = fit.variogram(k0.vgm, model = vgm(ini.sill, 'Sph', ini.range, nugget=ini.nug)) 
 
-model <- likfit(k0_dat, cov.model="matern", ini.cov.pars = c(ini.sill, ini.phi), 
-                 nug = ini.nug, fix.nugget=F, kappa=theta, fix.kappa=T,trend="cte")
+# Save plot of variogram
+png(file=sprintf('/Users/tnye/kappa/plots/paper/k0_semivariogram_%s_culled.png',model_name),
+    width=600, height=350, res=300)
+plot(k0.vgm, k0.fit, xlab="Distance (deg)", ylab="Semivariance",cex.lab=.5,cex.axis=.5)
+dev.off()
 
-# Prediction grid in UTM coordinates, i.e. northing and easting, converted to km
-# pred.grid<- expand.grid(seq(500000, 674000, l=175), 
-#                         seq(4028316, 4262316, l=235)) / 1000
+png(file=sprintf('/Users/tnye/kappa/plots/paper/k0_semivariogram_%s_culled.png',model_name),
+    width=600, height=350, res=300)
+plot(k0.vgm, k0.fit, xlab="Distance (deg)", ylab="Semivariance",cex.lab=.1,cex.axis=.1)
+dev.off()
 
-#pred.grid<- expand.grid(seq(-123, -121, l=201), 
-#                        seq(36.4, 38.5, l=211))
+# Kriging 1 --------------------------------------------------------------------
+grid <- read.csv("/Users/tnye/kappa/krige/grid_lonlat2.txt")
+coordinates(grid) = ~Longitude+Latitude
+k0.kriged = krige(kappa~1, k0.data, grid, model = k0.fit)
+spplot(k0.kriged["var1.pred"])
 
-# Read digitised 'whole TVZ' model of Wilson et al. (1995), coordinates in km
-#whole.tvz=read.table("/Users/tnye/code/kappa/codes/whole_tvz_ne.txt", header = TRUE)
-# whole.bay=read.table("/Users/tnye/kappa/krige/ne.txt", header = TRUE)
-# fbay<-ifelse(inpolygon(pred.grid$Var1, pred.grid$Var2, 
-#                        whole.bay$Easting/1000, whole.bay$Northing/1000), 1, 0)
-whole.bay=read.table("/Users/tnye/kappa/krige/lonlat.txt", header = TRUE)
-# fbay<-ifelse(inpolygon(pred.grid$Var1, pred.grid$Var2, 
-#                        whole.bay$Longitude, whole.bay$Latitude), 1, 0)
-fbay<-ifelse(inpolygon(grid$Longitude, grid$Latitude, 
-                       whole.bay$Longitude, whole.bay$Latitude), 1, 0)
-# Prediction
-# nug.model <- model$tausq
-#nug.model <- 0.0026
-theta.model <- 0.5
-sill.model <- model$sigmasq
-phi.model <- model$phi
-psiA.model <- model$aniso.pars[1]
-psiR.model <- model$aniso.pars[2]
+# Krige Predictions (in linear, not log10 units)
+k0.pred <- k0.kriged$var1.pred
 
-kc.model <- krige.conv(k0_dat, loc = grid,
-                       krige = krige.control(type.krige="ok", cov.model="matern",
-                                             cov.pars=c(sill.model, phi.model),
-                                             kappa=theta.model, nugget=nug.model,
-                                             aniso.pars=c(psiA.model, psiR.model),
-                                             trend.d="cte", trend.l="cte"),
-                       output = output.control(signal=T))
+# Krige Standard deviations
+k0.stddev <- sqrt(k0.kriged$var1.var)
 
-# Units of grid back to m
-Nor <- kc.model$Var2 * 1000
-Eas <- kc.model$Var1 * 1000
-k0.model <- 10^kc.model$predict
-logk0.stddev <- sqrt(kc.model$krige.var + nug.model)
-
-df <- data.frame("Latitude"=grid[,2], "Longitude"=grid[,1], "pred_k0"=k0.model, "log10k0_stddev"=logk0.stddev)
-write.csv(df, sprintf("/Users/tnye/kappa/krige/%s_krige_k0_lonlat.csv", model), row.names = FALSE)
-#(df, "/Users/tnye/kappa/krige/model2_krige_k0_lonlat.csv", row.names = FALSE)
-
+# Make Dataframe
+df <- data.frame("Latitude"=grid$Latitude, "Longitude"=grid$Longitude, "pred_k0"=k0.pred, "k0_stddev"=k0.stddev)
+write.csv(df, sprintf("/Users/tnye/kappa/krige/%s/%s_culled_krige_k0_linear.csv", model_name, model_name), row.names = FALSE)
 
 

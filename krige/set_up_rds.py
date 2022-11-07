@@ -16,7 +16,7 @@ import pandas as pd
 import numpy as np
 from pyproj import Proj
 
-model_name = 'model2'
+model_name = 'model4.6.7'
 home_dir = f'/Users/tnye/kappa/traditional_method/models/{model_name}'
 
 kappa_df = pd.read_csv(f'{home_dir}/{model_name}_kappa.out',delimiter='\t')
