@@ -11,18 +11,18 @@ Created on Mon Jan 10 16:24:46 2022
 # a major fault zone in the Bay area. 
 ###############################################################################
 
+# Imports
 import numpy as np
 import pandas as pd
-from glob import glob
 import geopandas as gpd
-from shapely.geometry import Point, Polygon
+from shapely.geometry import Point
 
-model_name = 'model1'
+model_name = 'model4.6.7'
 
 kml = '/Users/tnye/kappa/data/google_earth/damage_zones.kml'
 
 # Get list of station coordinates
-locations = pd.read_csv(f'/Users/tnye/kappa/GMT/data/kappa/{model_name}.txt')
+locations = pd.read_csv(f'/Users/tnye/kappa/GMT/data/kappa/{model_name}_culled.txt')
 
 kappa_file = pd.read_csv(f'/Users/tnye/kappa/traditional_method/models/{model_name}/{model_name}_kappa.out',delimiter='\t')
 
@@ -61,5 +61,5 @@ for i in range(0, len(geo_locations)):
     except:
         continue
 
-stn_df.to_csv(f'/Users/tnye/kappa/data/fault_zone_stns_{model_name}.csv')
+stn_df.to_csv(f'/Users/tnye/kappa/data/fault_zone_stns_{model_name}_culled.csv')
 

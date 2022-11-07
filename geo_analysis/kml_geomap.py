@@ -15,10 +15,9 @@ import numpy as np
 import pandas as pd
 from glob import glob
 import geopandas as gpd
-from shapely.geometry import Point, Polygon
+from shapely.geometry import Point
 
 kml_list = glob('/Users/tnye/kappa/data/google_earth/bay_kmls/*.kml')
-# kml = '/Users/tnye/kappa/data/google_earth/bay_kmls/Geology_Aetna_Springs.kml'
 
 # Get list of station coordinates
 locations = pd.read_csv('/Users/tnye/kappa/GMT/data/kappa/updated_stns.txt')
@@ -82,11 +81,6 @@ for i in range(0, len(geo_locations)):
                     stn_df['Geology'].iloc[i] = 'Metamorphic'
                 else:
                     stn_df['Geology'].iloc[i] = 'unknown'
-                
-                # if 'franciscan' in description.lower():
-                #     stn_df['Geology'].iloc[i] = 'Franciscan'
-                # if 'great valley' in description.lower():
-                #     stn_df['Geology'].iloc[i] = 'Great Valley'
                 
                 stn_df['Unit'].iloc[i] = unit
                 stn_df['Description'].iloc[i] = description
