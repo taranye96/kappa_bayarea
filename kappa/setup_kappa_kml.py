@@ -37,7 +37,7 @@ with open(kappa_file) as f:
             lat.append(event_df['Slat'].iloc[np.where(event_df['Name']==stn)[0][0]])
     
 # Save kappa to text file
-outfilename = f'/Users/tnye/kappa/data/google_earth/Bay_kappa.txt'
+outfilename = f'/Users/tnye/kappa/data/google_earth/Bay_kappa_{model_name}.txt'
 outfile = open(outfilename, 'w')
 out = (np.array([stns, lon, lat, kappa], dtype=object)).T
 
