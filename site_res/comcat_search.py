@@ -14,8 +14,7 @@ Created on Wed Aug 11 11:31:07 2021
 import numpy as np
 import pandas as pd
 from datetime import datetime
-import matplotlib.pyplot as plt
-from libcomcat.search import count, get_event_by_id, search
+from libcomcat.search import search
 from libcomcat.dataframes import get_detail_data_frame
 
 events = search(starttime=datetime(2000, 1, 4),endtime=datetime(2018, 4, 30),minlatitude=36,maxlatitude=39,minlongitude=-124,

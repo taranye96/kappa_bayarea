@@ -8,27 +8,30 @@ Created on Thu Aug 13 17:14:54 2020
 
 ###############################################################################
 # Script that reformats the output of the residual decomposition
-# (cnn_compute_meml_residuals.r) into text documents for each residual type. 
+# (cnn_compute_meml_residuals.R) into text documents for each residual type. 
 ###############################################################################
-
-### Residual analysis for Zhang Hongcai - Re-format MEML files from R
 
 import numpy as np
 import pandas as pd
 
-model_name = 'model1'
-project_directory = '/Users/tnye/kappa/residual_decomp/'
+model_name = 'model4.6.7'
+# project_directory = '/Users/tnye/kappa/residual_decomp/'
+project_directory = '/Users/tnye/kappa/residual_decomp/culled_dataset/Boore14_Vs30site/'
 
 ## location:
 loc_name = 'Bay'
 
 ## which model:
-model_name_list = ['lnASK14_PGA_Res','lnASK14_PGV_Res']
+# model_name_list = ['lnASK14_PGA_Res','lnASK14_PGV_Res']
+# model_name_list = ['lnASK14_PGA_Vs30ref_Res','lnASK14_PGV_Vs30ref_Res']
+model_name_list = ['lnBoore14_PGA_Res','lnBoore14_PGV_Res']
+# model_name_list = ['lnBoore14_PGA_Vs30ref_Res','lnBoore14_PGV_Vs30ref_Res']
+
 
 
 ## Read in the main file with pandas:
 # res_df = pd.read_csv(project_directory + 'data/' + loc_name + '_residual.txt',sep='\t')
-res_df = pd.read_csv(f'/Users/tnye/kappa/data/flatfiles/ASK14_pga_{model_name}.csv')
+res_df = pd.read_csv(f'/Users/tnye/kappa/data/flatfiles/GMM_{model_name}_culled.csv')
 
 ## Make empty dataframes for the event and site, with just event and site info:
 event_df = res_df.copy()[['Event ID',  'Latitude', 'Longitude', 'Depth', 'Magnitude']]
